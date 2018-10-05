@@ -1446,3 +1446,19 @@ from dnd.dbo.MonsterBase b
 join dnd.dbo.exptocr e
 on b.cr=e.cr
 
+Insert into dnd.dbo.ExpDiffMultiplier
+Values
+(1,1.5)
+,(2,2)
+,(3,2.5)
+,(4,2.5)
+,(5,2.5)
+,(6,2.5)
+,(7,3)
+,(8,3)
+,(9,3)
+,(10,3)
+,(11,5)
+,(12,5)
+,(13,5)
+,(14,5)

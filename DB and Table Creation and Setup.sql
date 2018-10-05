@@ -52,6 +52,8 @@ Create Table Backgrounds ([Name] varchar(100), Book varchar(100), Skills varchar
 
 Create Table dnd.dbo.ExpToCR (CR dec(6,3), Exp int)
 
+Create Table dnd.dbo.ExpDiffMultiplier (NumCreatures int, Multiplier dec(3,1))
+
 /*
 use master
 Drop Database DND
@@ -61,3 +63,4 @@ Drop Table dnd.dbo.MonsterLocations
 Drop Table dnd.dbo.MonsterAttacks
 Drop Table dnd.dbo.Backgrounds
 */
+

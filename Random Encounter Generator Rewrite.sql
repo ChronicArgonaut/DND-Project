@@ -1,7 +1,7 @@
 use DND
 Go
 
-Create Table #MonstersFinal (MonsterID uniqueidentifier, CR dec(6,3),Counter int)
+Create Table #MonstersFinal (MonsterID uniqueidentifier, CR dec(6,3),Counter int, [Exp] Int)
 Create Table #CRS (CR varchar(100))
 
 Declare @MaxCR Dec(6,3)
@@ -17,19 +17,22 @@ Declare @CR Dec(6,3)
 Declare @TypesToExclude varchar(100)
 Declare @MonstersToExclude varchar(200)
 Declare @ExplicitTypes varchar(100)
+Declare @MaxExp int
+Declare @Exp int
 
 
 
 -------------------------------------------------------------------
 
-Set @MaxCR =20
-Set @Locations='Arctic,Coast'
-Set @ExplicitCreatures = 'Wraith,goblin'
-Set @ExplicitTypes ='Giant,Undead'
-Set @CRsToExclude='0,1/8,1/4,1/2,1'
-Set @AlignmentsToExclude=',G'
-Set @TypesToExclude ='Humanoid,Beast'
-Set @MonstersToExclude = ''
+--Set @MaxCR =20
+Set @MaxExp=1000
+Set @Locations=''
+Set @ExplicitCreatures = ''
+Set @ExplicitTypes =''
+Set @CRsToExclude='0,1/8,1/4'
+Set @AlignmentsToExclude=''
+Set @TypesToExclude =''
+Set @MonstersToExclude = 'Humanoid'
 Set @Maxcounter = 10
 
 
@@ -37,7 +40,7 @@ Set @Maxcounter = 10
 
 Select * into #MonsterList from MonsterAllView (nolock)
 
-Set @CR=@MaxCR
+Set @Exp=@MaxExp
 
 Set @CRsToExclude=replace(Replace(Replace(@CRsToExclude,'1/8','0.125'),'1/4','0.250'),'1/2','0.500')
 
@@ -102,28 +105,28 @@ end
 If @ExplicitCreatures!=''
 Begin
 Insert into #MonstersFinal
-Select MV.Monsterid, MV.CR, '0' from MonsterAllView MV (nolock)
+Select MV.Monsterid, MV.CR, '0',[Exp] from MonsterAllView MV (nolock)
 Cross Apply STRING_SPLIT(@ExplicitCreatures, ',') SS
 where MV.name = ss.Value 
 
-Set @CR = @MaxCR - (Select isnull(sum(CR),0) from #MonstersFinal)
+Set @Exp = @MaxExp - (Select isnull(sum(Exp),0) from #MonstersFinal)
 End
 
-While @MaxCR > 0 and @Counter < @MaxCounter
+While @Exp > 0 and @Counter < @MaxCounter
 Begin
 
 Insert into #MonstersFinal
-Select top 1 MonsterId, CR, @Counter as [Counter]  from #MonsterList (nolock)
-where CR <= @CR
+Select top 1 MonsterId, CR, @Counter as [Counter],[Exp]  from #MonsterList (nolock)
+where [Exp] <= @Exp
 Order by newid()
 
-Set @CR = @CR - (Select Top 1 CR from #MonstersFinal order by Counter desc)
+Set @Exp = @Exp - (Select Top 1 [Exp] from #MonstersFinal order by Counter desc)
 
 Set @Counter = @Counter + 1
 
 End
 
-If @MaxCR>=(select sum(isnull(cr,0)) from #MonstersFinal)
+If @MaxExp>=(select sum(isnull(Exp,0)) from #MonstersFinal)
 Select t.counter,MV.* from #MonstersFinal t (nolock)
 join dnd.dbo.monsterallview MV (nolock)
 on t.MonsterID=MV.MonsterID
