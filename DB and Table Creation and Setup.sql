@@ -35,7 +35,7 @@ go
 
 create view MonsterAllView(MonsterID ,NAME ,Type,Alignment ,Size,CR,AC, HP, [Exp],[Spellcasting?],STR,DEX,CON,INT,WIS,CHA ,Attack1,Attack2 ,book,page,Arctic,Coast,desert,forest,grassland,hill,mountain,swamp,underdark,underwater,urban)
 as
-Select mb.MonsterID,mb.NAME,mb.Type,mb.Alignment,mb.Size,mb.CR,mb.AC,mb.HP,mb.[Spellcasting?],ms.STR,ms.DEX,ms.CON,ms.INT,ms.WIS,ms.CHA,a1.Attack1,a2.Attack2,mb.book,mb.page,ml.Arctic,ml.Coast,ml.desert,ml.forest,ml.grassland,ml.hill,ml.mountain,ml.swamp,ml.underdark,ml.underwater,ml.urban  from dnd.dbo.MonsterBase mb (nolock)
+Select mb.MonsterID,mb.NAME,mb.Type,mb.Alignment,mb.Size,mb.CR,mb.AC,mb.HP,mb.Exp,mb.[Spellcasting?],ms.STR,ms.DEX,ms.CON,ms.INT,ms.WIS,ms.CHA,a1.Attack1,a2.Attack2,mb.book,mb.page,ml.Arctic,ml.Coast,ml.desert,ml.forest,ml.grassland,ml.hill,ml.mountain,ml.swamp,ml.underdark,ml.underwater,ml.urban  from dnd.dbo.MonsterBase mb (nolock)
 join dnd.dbo.MonsterLocations ml (nolock)
 on mb.MonsterID=ml.MonsterID
 join dnd.dbo.MonsterStats MS (nolock)
@@ -49,6 +49,8 @@ on A2.MonsterID=mb.MonsterID
 go
 
 Create Table Backgrounds ([Name] varchar(100), Book varchar(100), Skills varchar(150), Languages varchar(100), Tools varchar(100))
+
+Create Table dnd.dbo.ExpToCR (CR dec(6,3), Exp int)
 
 /*
 use master
