@@ -12,7 +12,6 @@ create index i4 on #temp2(MonsterID)
 
 insert into [#temp1] (Name, Type, ALIGNMENT, Size, CR, AC, HP, [Spellcasting?], [Attack 1 damage], [Attack 2 Damage], Page, Arctic, Coast, Desert, Forest, Grassland, Hill, Mountain, Swamp, Underdark, Underwater, Urban, Book)
 values
-
  ('Aarakocra', 'Humanoid', 'NG', 'Medium', .25, 12, 13, 'NO', '1d4+2', '1d6+2', 12, 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', 'YES', 'NO', 'NO', 'NO', 'NO', 'Monster Manual')
 ,('Abjurer', 'Humanoid', 'ANY', 'Medium', 9, 12, 84, 'YES', '1d6-1', 'N/A', 209, 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', 'YES', 'Volo''s Guide to Monsters')
 ,('Aboleth', 'Aberration', 'LE', 'Large', 10, 17, 135, 'NO', '2d6+5', '3d6+5', 13, 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', 'YES', 'NO', 'NO', 'Monster Manual')
