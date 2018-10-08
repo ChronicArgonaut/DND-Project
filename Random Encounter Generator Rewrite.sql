@@ -19,13 +19,17 @@ Declare @MonstersToExclude varchar(200)
 Declare @ExplicitTypes varchar(100)
 Declare @MaxExp int
 Declare @Exp int
+Declare @PartyLevel int
+Declare @ExpCalc int
+Declare @ExpVar varchar (100)
+Declare @MonsterCount int
 
 
 
 -------------------------------------------------------------------
 
 --Set @MaxCR =20
-Set @MaxExp=1000
+Set @PartyLevel=10
 Set @Locations=''
 Set @ExplicitCreatures = ''
 Set @ExplicitTypes =''
@@ -33,12 +37,24 @@ Set @CRsToExclude='0,1/8,1/4'
 Set @AlignmentsToExclude=''
 Set @TypesToExclude =''
 Set @MonstersToExclude = 'Humanoid'
-Set @Maxcounter = 10
+Set @Maxcounter = 14
 
 
 -------------------------------------------------------------------
 
-Select * into #MonsterList from MonsterAllView (nolock)
+
+
+
+Set @MaxExp =(select [exp] from dnd.dbo.ExpToCR E (nolock)
+where CR = case when @PartyLevel = 1 then 0.175 when @PartyLevel = 2 then 0.250 when @PartyLevel = 3 then 0.500 when @PartyLevel > 3 then @PartyLevel -3 end)
+
+Set @ExpCalc = @MaxExp
+
+Set @MaxExp = @MaxExp + (@MaxExp * (rand() * - 4)/5) 
+
+
+
+Select * into #MonsterList from MonsterAllView (nolock) 
 
 Set @Exp=@MaxExp
 
@@ -132,6 +148,16 @@ join dnd.dbo.monsterallview MV (nolock)
 on t.MonsterID=MV.MonsterID
 else
 select 'oops'
+
+Set @MonsterCount=(Select Count(*) from #MonstersFinal)
+
+Set @ExpCalc = (Select (e.multiplier * @MaxExp) from  dnd.dbo.ExpDiffMultiplier E
+where e.NumCreatures = @MonsterCount) 
+
+Select 'Encounter is ' + convert(varchar(100),convert(dec (8,2),@ExpCalc)/[EXP] * 100) + '% of a level '+ convert(varchar(100),@PartyLevel) + ' party Encounter' from dnd.dbo.ExpToCR CR
+where CR = case when @PartyLevel = 1 then 0.175 when @PartyLevel = 2 then 0.250 when @PartyLevel = 3 then 0.500 when @PartyLevel > 3 then @PartyLevel -3 end
+
+
 
 Drop Table #MonstersFinal
 Drop Table #MonsterList
