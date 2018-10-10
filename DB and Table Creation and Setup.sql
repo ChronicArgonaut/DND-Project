@@ -7,28 +7,28 @@ GO
 USE DND
 GO
 
-CREATE TABLE MonsterBase (MonsterID UNIQUEIDENTIFIER Not Null, name varchar(50),type varchar(20),alignment varchar(20),size varchar(20), CR dec(6,3), AC varchar (10), Hp varchar (10), [Exp] int, [Spellcasting?] varchar(3), page varchar(20), book varchar(100), CreatedDate Datetime default CURRENT_TIMESTAMP, Primary Key (MonsterID))
+CREATE TABLE MonsterBase (MonsterID UNIQUEIDENTIFIER Not Null, name varchar(50),type varchar(20),alignment varchar(20),size varchar(20), CR dec(6,3), AC varchar (10), Hp varchar (10), [Exp] int, [Spellcasting?] varchar(3), page varchar(20), book varchar(100), ChangedDate Datetime default CURRENT_TIMESTAMP, Primary Key (MonsterID))
 GO
 CREATE INDEX NameIndex on MonsterBase(name)
 GO
 
 --Drop Table MonsterBase
 
-CREATE TABLE MonsterStats (MonsterID UNIQUEIDENTIFIER FOREIGN KEY REFERENCES MonsterBase(MonsterID), STR int, DEX int, CON int, INT int, WIS int, CHA int, CreatedDate Datetime default CURRENT_TIMESTAMP)
+CREATE TABLE MonsterStats (MonsterID UNIQUEIDENTIFIER FOREIGN KEY REFERENCES MonsterBase(MonsterID), STR int, DEX int, CON int, INT int, WIS int, CHA int, ChangedDate Datetime default CURRENT_TIMESTAMP)
 GO
 CREATE CLUSTERED INDEX IDIndex on MonsterStats(MonsterID)
 GO 
 
 --Drop Table MonsterStats
 
-CREATE TABLE MonsterLocations (MonsterID UNIQUEIDENTIFIER FOREIGN KEY REFERENCES MonsterBase(MonsterID), Arctic varchar(3), coast varchar(3), desert varchar(3), forest varchar(3), grassland varchar(3), hill varchar(3), mountain varchar(3), swamp varchar(3), underdark varchar(3), underwater varchar(3), urban varchar(3),CreatedDate Datetime default CURRENT_TIMESTAMP)
+CREATE TABLE MonsterLocations (MonsterID UNIQUEIDENTIFIER FOREIGN KEY REFERENCES MonsterBase(MonsterID), Arctic varchar(3), coast varchar(3), desert varchar(3), forest varchar(3), grassland varchar(3), hill varchar(3), mountain varchar(3), swamp varchar(3), underdark varchar(3), underwater varchar(3), urban varchar(3),ChangedDate Datetime default CURRENT_TIMESTAMP)
 GO
 CREATE CLUSTERED INDEX IDIndex on MonsterLocations(MonsterID)
 GO 
 
 --Drop Table MonsterLocations
 
-CREATE TABLE MonsterAttacks (MonsterID UNIQUEIDENTIFIER  FOREIGN KEY REFERENCES MonsterBase(MonsterID), AttackName varchar(100), ToHit int, AttackDamage varchar(100),CreatedDate Datetime default CURRENT_TIMESTAMP)
+CREATE TABLE MonsterAttacks (MonsterID UNIQUEIDENTIFIER  FOREIGN KEY REFERENCES MonsterBase(MonsterID), AttackName varchar(100), ToHit int, AttackDamage varchar(100),ChangedDate Datetime default CURRENT_TIMESTAMP)
 GO
 CREATE CLUSTERED INDEX IDIndex on MonsterAttacks(MonsterID)
 go
@@ -53,6 +53,46 @@ Create Table Backgrounds ([Name] varchar(100), Book varchar(100), Skills varchar
 Create Table dnd.dbo.ExpToCR (CR dec(6,3), Exp int)
 
 Create Table dnd.dbo.ExpDiffMultiplier (NumCreatures int, Multiplier dec(3,1))
+go
+
+
+create trigger dbo.UpdateTimestampMB on dbo.monsterbase
+After Update
+as
+Update mb
+Set ChangedDate=getdate()
+from MonsterBase mb
+join inserted i on i.monsterid=mb.monsterid
+GO
+
+create trigger dbo.UpdateTimestampMA on dbo.MonsterAttacks
+After Update
+as
+Update ma
+Set ChangedDate=getdate()
+from MonsterAttacks mA
+join inserted i on i.monsterid=ma.monsterid
+GO
+
+create trigger dbo.UpdateTimestampMS on dbo.MonsterStats
+After Update
+as
+Update ms
+Set ChangedDate=getdate()
+from MonsterStats ms
+join inserted i on i.monsterid=ms.monsterid
+go
+
+create trigger dbo.UpdateTimestampML on dbo.MonsterLocations
+After Update
+as
+Update ML
+Set ChangedDate=getdate()
+from MonsterLocations ml
+join inserted i on i.monsterid=ml.monsterid
+go
+
+
 
 /*
 use master
@@ -64,3 +104,29 @@ Drop Table dnd.dbo.MonsterAttacks
 Drop Table dnd.dbo.Backgrounds
 */
 
+
+
+--use dnd
+--SELECT 
+--     sysobjects.name AS trigger_name 
+--    ,USER_NAME(sysobjects.uid) AS trigger_owner 
+--    ,s.name AS table_schema 
+--    ,OBJECT_NAME(parent_obj) AS table_name 
+--    ,OBJECTPROPERTY( id, 'ExecIsUpdateTrigger') AS isupdate 
+--    ,OBJECTPROPERTY( id, 'ExecIsDeleteTrigger') AS isdelete 
+--    ,OBJECTPROPERTY( id, 'ExecIsInsertTrigger') AS isinsert 
+--    ,OBJECTPROPERTY( id, 'ExecIsAfterTrigger') AS isafter 
+--    ,OBJECTPROPERTY( id, 'ExecIsInsteadOfTrigger') AS isinsteadof 
+--    ,OBJECTPROPERTY(id, 'ExecIsTriggerDisabled') AS [disabled] 
+--FROM sysobjects 
+
+--INNER JOIN sysusers 
+--    ON sysobjects.uid = sysusers.uid 
+
+--INNER JOIN sys.tables t 
+--    ON sysobjects.parent_obj = t.object_id 
+
+--INNER JOIN sys.schemas s 
+--    ON t.schema_id = s.schema_id 
+
+--WHERE sysobjects.type = 'TR'
