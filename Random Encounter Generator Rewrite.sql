@@ -29,7 +29,7 @@ Declare @MonsterCount int
 -------------------------------------------------------------------
 
 --Set @MaxCR =20
-Set @PartyLevel=10
+Set @PartyLevel=5
 Set @Locations=''
 Set @ExplicitCreatures = ''
 Set @ExplicitTypes =''
@@ -37,7 +37,7 @@ Set @CRsToExclude='0,1/8,1/4'
 Set @AlignmentsToExclude=''
 Set @TypesToExclude =''
 Set @MonstersToExclude = 'Humanoid'
-Set @Maxcounter = 14
+Set @Maxcounter = 4
 
 
 -------------------------------------------------------------------
@@ -154,9 +154,11 @@ Set @MonsterCount=(Select Count(*) from #MonstersFinal)
 Set @ExpCalc = (Select (e.multiplier * @MaxExp) from  dnd.dbo.ExpDiffMultiplier E
 where e.NumCreatures = @MonsterCount) 
 
-Select 'Encounter is ' + convert(varchar(100),convert(dec (8,2),@ExpCalc)/[EXP] * 100) + '% of a level '+ convert(varchar(100),@PartyLevel) + ' party Encounter' from dnd.dbo.ExpToCR CR
+Select 'Encounter is ' + convert(varchar(100),convert(dec (8,2),@ExpCalc)/[EXP] * 100) + '% of a level '+ convert(varchar(100),@PartyLevel) + ' party Encounter' [Percentage of Party Level Encounter] from dnd.dbo.ExpToCR CR
 where CR = case when @PartyLevel = 1 then 0.175 when @PartyLevel = 2 then 0.250 when @PartyLevel = 3 then 0.500 when @PartyLevel > 3 then @PartyLevel -3 end
 
+Select top 1 'This is closest to a '+ convert(varchar(8),CR) +' CR fight' as [CR Equivalent Fight] from dnd.dbo.exptocr (nolock)
+order by abs(exp - @ExpCalc)
 
 
 Drop Table #MonstersFinal
