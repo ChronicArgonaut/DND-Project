@@ -52,8 +52,6 @@ Set @ExpCalc = @MaxExp
 
 Set @MaxExp = @MaxExp + (@MaxExp * (rand() * - 4)/5) 
 
-
-
 Select * into #MonsterList from MonsterAllView (nolock) 
 
 Set @Exp=@MaxExp
@@ -62,28 +60,28 @@ Set @CRsToExclude=replace(Replace(Replace(@CRsToExclude,'1/8','0.125'),'1/4','0.
 
 If @TypesToExclude !=''
 Begin
-Delete ml 
-from #MonsterList ml
-cross apply STRING_SPLIT(@TypesToExclude, ',') SS
-where  ss.value=ml.type-- in (SELECT Value FROM STRING_SPLIT(@TypesToExclude, ','))
+	Delete ml 
+	from #MonsterList ml
+	cross apply STRING_SPLIT(@TypesToExclude, ',') SS
+	where  ss.value=ml.type-- in (SELECT Value FROM STRING_SPLIT(@TypesToExclude, ','))
 end
 
 If @ExplicitTypes!='' and exists(select * from MonsterBase where type in (SELECT Value FROM STRING_SPLIT(@ExplicitTypes, ',')))
 Begin
-Delete from #MonsterList
-
-Insert into #MonsterList
-Select MV.* from MonsterAllView MV
-Cross APply STRING_SPLIT(@ExplicitTypes, ',') SS
-WHere MV.type =SS.Value
+	Delete from #MonsterList
+	
+	Insert into #MonsterList
+	Select MV.* from MonsterAllView MV
+	Cross APply STRING_SPLIT(@ExplicitTypes, ',') SS
+	WHere MV.type =SS.Value
 End
 
 If @CRsToExclude !=''  and exists(select * from MonsterBase where CR in (SELECT convert(decimal(6,3),Value) FROM STRING_SPLIT(@CrsToExclude, ',')))
-Begin
-Delete ML
-from #MonsterList ML
-cross apply STRING_SPLIT(@CrsToExclude, ',') as SS
-where ML.CR= convert(decimal(6,3),SS.Value) 
+	Begin
+	Delete ML
+	from #MonsterList ML
+	cross apply STRING_SPLIT(@CrsToExclude, ',') as SS
+	where ML.CR= convert(decimal(6,3),SS.Value) 
 end
 
 SELECT Value as [Alignment] into #Alignments FROM STRING_SPLIT(@AlignmentsToExclude, ',')
@@ -101,9 +99,9 @@ Exec (@Sql1)
 
 If @Locations!='' 
 Begin
-Select @Sql2 += 'Delete from #MonsterList
-where '+[Location]+' = ''No''
-' from #Locations
+	Select @Sql2 += 'Delete from #MonsterList
+	where '+[Location]+' = ''No''
+	' from #Locations
 end
 
 Exec (@Sql2)
@@ -112,42 +110,40 @@ Exec (@Sql2)
 
 If @MonstersToExclude !=''
 Begin
-Delete ML
-from #MonsterList ML
-Cross Apply STRING_SPLIT(@MonstersToExclude, ',') as SS
-where  ML.Name=SS.Value
+	Delete ML
+	from #MonsterList ML
+	Cross Apply STRING_SPLIT(@MonstersToExclude, ',') as SS
+	where  ML.Name=SS.Value
 end
 
 If @ExplicitCreatures!=''
 Begin
-Insert into #MonstersFinal
-Select MV.Monsterid, MV.CR, '0',[Exp] from MonsterAllView MV (nolock)
-Cross Apply STRING_SPLIT(@ExplicitCreatures, ',') SS
-where MV.name = ss.Value 
-
-Set @Exp = @MaxExp - (Select isnull(sum(Exp),0) from #MonstersFinal)
+	Insert into #MonstersFinal
+	Select MV.Monsterid, MV.CR, '0',[Exp] from MonsterAllView MV (nolock)
+	Cross Apply STRING_SPLIT(@ExplicitCreatures, ',') SS
+	where MV.name = ss.Value 
+	
+	Set @Exp = @MaxExp - (Select isnull(sum(Exp),0) from #MonstersFinal)
 End
 
 While @Exp > 0 and @Counter < @MaxCounter
 Begin
-
-Insert into #MonstersFinal
-Select top 1 MonsterId, CR, @Counter as [Counter],[Exp]  from #MonsterList (nolock)
-where [Exp] <= @Exp
-Order by newid()
-
-Set @Exp = @Exp - (Select Top 1 [Exp] from #MonstersFinal order by Counter desc)
-
-Set @Counter = @Counter + 1
-
+	Insert into #MonstersFinal
+	Select top 1 MonsterId, CR, @Counter as [Counter],[Exp]  from #MonsterList (nolock)
+	where [Exp] <= @Exp
+	Order by newid()
+	
+	Set @Exp = @Exp - (Select Top 1 [Exp] from #MonstersFinal order by Counter desc)
+	
+	Set @Counter = @Counter + 1
 End
 
 If @MaxExp>=(select sum(isnull(Exp,0)) from #MonstersFinal)
-Select t.counter,MV.* from #MonstersFinal t (nolock)
-join dnd.dbo.monsterallview MV (nolock)
-on t.MonsterID=MV.MonsterID
+	Select t.counter,MV.* from #MonstersFinal t (nolock)
+	join dnd.dbo.monsterallview MV (nolock)
+	on t.MonsterID=MV.MonsterID
 else
-select 'oops'
+	select 'oops'
 
 Set @MonsterCount=(Select Count(*) from #MonstersFinal)
 
