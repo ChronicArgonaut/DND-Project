@@ -12,7 +12,6 @@ create index i4 on #temp2(MonsterID)
 
 insert into [#temp1] (Name, Type, ALIGNMENT, Size, CR, AC, HP, [Spellcasting?], [Attack 1 damage], [Attack 2 Damage], Page, Arctic, Coast, Desert, Forest, Grassland, Hill, Mountain, Swamp, Underdark, Underwater, Urban, Book)
 values
-
  ('Aarakocra', 'Humanoid', 'NG', 'Medium', .25, 12, 13, 'NO', '1d4+2', '1d6+2', 12, 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', 'YES', 'NO', 'NO', 'NO', 'NO', 'Monster Manual')
 ,('Abjurer', 'Humanoid', 'ANY', 'Medium', 9, 12, 84, 'YES', '1d6-1', 'N/A', 209, 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', 'YES', 'Volo''s Guide to Monsters')
 ,('Aboleth', 'Aberration', 'LE', 'Large', 10, 17, 135, 'NO', '2d6+5', '3d6+5', 13, 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', 'YES', 'NO', 'NO', 'Monster Manual')
@@ -1404,3 +1403,62 @@ values
 ,('Anthropologist', 'ToA', 'Insight (WIS), religion (INT)', 'Any x2', 'None')
 ,('Archaeologist', 'ToA', 'History (INT), survival (WIS)', 'Any x1', 'Choose 1: cartographer''s tools, navigator''s tools')
 ,('House Agent', 'WGE', 'Investigation (INT), persuasion (CHA)', 'None', 'Special (See page)')
+
+Insert into dnd.dbo.ExpToCr values
+('0','0')
+,(0.125,25)
+,(0.250,50)
+,(0.500,100)
+,(1,200)
+,(2,450)
+,(3,700)
+,(4,1100)
+,(5,1800)
+,(6,2300)
+,(7,2900)
+,(8,3900)
+,(9,5000)
+,(10,5900)
+,(11,7200)
+,(12,8400)
+,(13,10000)
+,(14,11500)
+,(15,13000)
+,(16,15000)
+,(17,18000)
+,(18,20000)
+,(19,22000)
+,(20,25000)
+,(21,33000)
+,(22,41000)
+,(23,50000)
+,(24,62000)
+,(25,75000)
+,(26,90000)
+,(27,105000)
+,(28,120000)
+,(29,135000)
+,(30,155000)
+
+update B
+set b.exp=e.exp
+from dnd.dbo.MonsterBase b
+join dnd.dbo.exptocr e
+on b.cr=e.cr
+
+Insert into dnd.dbo.ExpDiffMultiplier
+Values
+(1,1.5)
+,(2,2)
+,(3,2.5)
+,(4,2.5)
+,(5,2.5)
+,(6,2.5)
+,(7,3)
+,(8,3)
+,(9,3)
+,(10,3)
+,(11,5)
+,(12,5)
+,(13,5)
+,(14,5)
