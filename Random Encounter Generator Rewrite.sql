@@ -154,7 +154,7 @@ Select 'Encounter is ' + convert(varchar(100),convert(dec (8,2),@ExpCalc)/[EXP] 
 where CR = case when @PartyLevel = 1 then 0.175 when @PartyLevel = 2 then 0.250 when @PartyLevel = 3 then 0.500 when @PartyLevel > 3 then @PartyLevel -3 end
 
 Select top 1 'This is closest to a '+ convert(varchar(8),CR) +' CR fight' as [CR Equivalent Fight] from dnd.dbo.exptocr (nolock)
-order by abs(exp - @ExpCalc)
+order by abs([exp] - @ExpCalc)
 
 
 Drop Table #MonstersFinal
