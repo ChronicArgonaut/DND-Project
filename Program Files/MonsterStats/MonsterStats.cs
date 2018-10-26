@@ -31,7 +31,7 @@ namespace MonsterStats
                     Console.WriteLine("Finding monster stats for {0}\n\n", name);
                     SqlDataReader dataReader = dataCommand.ExecuteReader();
                     if (!dataReader.HasRows)
-                        Console.WriteLine("No monster by the name of {0}", name);
+                        Console.WriteLine("No monster git puby the name of {0}", name);
                     else
                     {
                         while (dataReader.Read())
